@@ -2,6 +2,11 @@ import streamlit as st
 from openai import OpenAI 
 import json
 
+# This application uses the OpenAI API to generate structured Pokemon Pokedex entries
+# in JSON format, then parses and stores them so users can view, filter, and manage
+# their own collection of generated Pokemon within the app.
+
+
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
                 
 if "pokedex" not in st.session_state:
@@ -10,15 +15,22 @@ if "pokedex" not in st.session_state:
 st.title("Pokemon Pokedex Generator")
 st.subheader("Generate, save, view, and filter Pokemon entries.")
 st.write("This website allows users to generate, save, and explore Pokémon Pokedex entries using AI.")
+
 # This application generates a detailed Pokemon Pokedex entry based on a user-provided name, then saves it so users can view or filter previously generated Pokemon.
+# Expected user input:
+# - Question1: user selects an action ("1", "2", or "3")
+#   1 = generate a new Pokemon
+#   2 = view all saved Pokemon
+#   3 = filter Pokemon by type
+# - Question2: (only if "1") Pokemon name to generate
+# - Question3: (only if "3") Pokemon type to filter (e.g., water, fire)
 
-Question1 = st.text_input("""What do you want to do first?
-1. add a pokemon
-2. check the pokemon you have already added
-3. check this type (ex: water, ghost, etc)
-""")
+Question1 = st.selectbox(
+    "Choose an action:",
+    ["Add a Pokemon", "View all Pokemon", "Filter by type"]
+)
 
-if Question1 == "1":
+if Question1 == "add a pokemon":
     Question2 = st.text_input("what's the name of this pokemon?")
 
     if Question2:
@@ -109,7 +121,7 @@ if Question1 == "1":
         st.write("Weak to:", ", ".join(pokemon["A list of types that it's weak to"]))
         st.write("Evolves to:", pokemon["What it evolves to"][0])
 
-elif Question1 == "2":
+elif Question1 == "View all Pokemon":
     if st.session_state.pokedex == []:
         st.warning("You do not record pokemon.")
     else:
@@ -132,7 +144,7 @@ elif Question1 == "2":
                 st.write("Weak to:", ", ".join(p["Weak to"]))
                 st.write("Evolves to:", p["Evolves to"])
 
-elif Question1 == "3":
+elif Question1 == "Filter by type":
     Question3 = st.text_input("Which types Pokemon do you check for")
 
     if Question3:
